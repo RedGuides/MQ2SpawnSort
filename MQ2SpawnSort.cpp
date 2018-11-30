@@ -111,10 +111,14 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 			{
 				for (auto i = 0; i < 6; i++)
 				{
+					if (!GetCharInfo()->pGroupInfo->pMember[i])
+						continue;
+
 					if (GetCharInfo()->pGroupInfo->pMember[i]->pSpawn == pSpawn)
 					{
 						typeVar.Type = pGroupMemberType;
 						typeVar.DWord = i;
+						break;
 					}
 				}
 			}
@@ -194,6 +198,7 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 			{
 				Ret.Type = pXTargetType;
 				Ret.DWord = i;
+				break;
 			}
 		}
 	}
@@ -201,10 +206,14 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 	{
 		for (auto i = 0; i < 6; i++)
 		{
+			if (!GetCharInfo()->pGroupInfo->pMember[i])
+				continue;
+
 			if (GetCharInfo()->pGroupInfo->pMember[i]->pSpawn == pSpawn)
 			{
 				Ret.Type = pGroupMemberType;
 				Ret.DWord = i;
+				break;
 			}
 		}
 	}

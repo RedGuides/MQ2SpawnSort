@@ -4,7 +4,7 @@
 PLUGIN_VERSION(0.2);
 PreSetup("MQ2SpawnSort");
 
-BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret);
+bool dataSpawnSort(const char* szIndex, MQTypeVar& Ret);
 
 // Called once, when the plugin is to initialize
 PLUGIN_API VOID InitializePlugin(VOID)
@@ -18,7 +18,7 @@ PLUGIN_API VOID ShutdownPlugin(VOID)
 	RemoveMQ2Data("SpawnSort");
 }
 
-BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
+bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 {
 	// szIndex format:
 	// <n>,<asc|desc>,<member>,<spawn search string>
@@ -28,7 +28,7 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 	bool ascending;
 	char member[MAX_STRING] = { 0 };
 	char index[MAX_STRING] = { 0 };
-	SEARCHSPAWN searchSpawn;
+	MQSpawnSearch searchSpawn;
 
 	// n
 	if (GetArg(szArg, szIndex, 1, FALSE, FALSE, TRUE) && strlen(szArg) > 0)
@@ -72,7 +72,7 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 	std::multimap<double, PSPAWNINFO> listByDouble;
 	std::multimap<__int64, PSPAWNINFO> listBySigned;
 	std::multimap<std::string, PSPAWNINFO> listByString;
-	// This should probably just be a key of MQ2TYPEVAR with a comparator created for it but that'll cause problems with string storage so meh
+	// This should probably just be a key of MQTypeVar with a comparator created for it but that'll cause problems with string storage so meh
 
 	PSPAWNINFO pOrigin = searchSpawn.FromSpawnID ? (PSPAWNINFO)GetSpawnByID(searchSpawn.FromSpawnID) : (PSPAWNINFO)pCharSpawn; // idk what this is but superwho does it so I will too
 	PSPAWNINFO pSpawn = (PSPAWNINFO)pSpawnList;
@@ -82,8 +82,8 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 	{
 		if (SpawnMatchesSearch(&searchSpawn, pOrigin, pSpawn))
 		{
-			MQ2TYPEVAR typeVar = { 0 };
-			MQ2TYPEVAR ret = { 0 };
+			MQTypeVar typeVar;
+			MQTypeVar ret;
 
 			// Special cases for MQ2Nav members
 			if (!_stricmp(member, "PathExists") || !_stricmp(member, "PathLength"))

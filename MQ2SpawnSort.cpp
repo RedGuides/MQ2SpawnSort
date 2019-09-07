@@ -1,4 +1,4 @@
-#include "../../MQ2Plugin.h"
+#include <MQ2Plugin.h>
 #include <functional>
 
 PLUGIN_VERSION(0.2);

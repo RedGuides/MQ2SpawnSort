@@ -24,6 +24,9 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 	// <n>,<asc|desc>,<member>,<spawn search string>
 	char szArg[MAX_STRING] = { 0 };
 
+	char mutableIndex[MAX_STRING] = { 0 };
+	strcpy_s(mutableIndex, szIndex);
+
 	unsigned int n;
 	bool ascending;
 	char member[MAX_STRING] = { 0 };
@@ -31,7 +34,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 	MQSpawnSearch searchSpawn;
 
 	// n
-	if (GetArg(szArg, szIndex, 1, FALSE, FALSE, TRUE) && strlen(szArg) > 0)
+	if (GetArg(szArg, mutableIndex, 1, FALSE, FALSE, TRUE) && strlen(szArg) > 0)
 	{
 		char * pFound;
 		n = strtoul(szArg, &pFound, 10);
@@ -42,7 +45,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 		return false;
 
 	// asc|desc
-	if (GetArg(szArg, szIndex, 2, FALSE, FALSE, TRUE) && strlen(szArg) > 0)
+	if (GetArg(szArg, mutableIndex, 2, FALSE, FALSE, TRUE) && strlen(szArg) > 0)
 	{
 		if (!_stricmp(szArg, "asc"))
 			ascending = true;
@@ -55,11 +58,11 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 		return false;
 
 	// member
-	if (!GetArg(member, szIndex, 3, FALSE, FALSE, TRUE) || strlen(szArg) == 0)
+	if (!GetArg(member, mutableIndex, 3, FALSE, FALSE, TRUE) || strlen(szArg) == 0)
 		return false;
 
 	// spawn search string, it's whatever's left
-	strcpy_s(szArg, GetNextArg(szIndex, 3, TRUE));
+	strcpy_s(szArg, GetNextArg(mutableIndex, 3, TRUE));
 	if (strlen(szArg) > 0)
 	{
 		ClearSearchSpawn(&searchSpawn);

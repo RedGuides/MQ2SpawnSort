@@ -100,7 +100,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 			// If search string allows us to restrict to group member or xtarget, we can use those types instead of spawn
 			else if (searchSpawn.bXTarHater)
 			{
-				for (auto i = 0; i < 13; i++)
+				for (auto i = 0; i < MAX_XTARGETS; i++)
 				{
 					if (GetCharInfo()->pXTargetMgr->XTargetSlots[i].SpawnID == pSpawn->SpawnID)
 					{
@@ -112,7 +112,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 			}
 			else if (searchSpawn.bGroup)
 			{
-				for (auto i = 0; i < 6; i++)
+				for (auto i = 0; i < MAX_GROUP_SIZE; i++)
 				{
 					if (!GetCharInfo()->pGroupInfo->pMember[i])
 						continue;
@@ -195,7 +195,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 
 	if (searchSpawn.bXTarHater)
 	{
-		for (auto i = 0; i < 13; i++)
+		for (auto i = 0; i < MAX_XTARGETS; i++)
 		{
 			if (GetCharInfo()->pXTargetMgr->XTargetSlots[i].SpawnID == pSpawn->SpawnID)
 			{
@@ -207,7 +207,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 	}
 	else if (searchSpawn.bGroup)
 	{
-		for (auto i = 0; i < 6; i++)
+		for (auto i = 0; i < MAX_GROUP_SIZE; i++)
 		{
 			if (!GetCharInfo()->pGroupInfo->pMember[i])
 				continue;

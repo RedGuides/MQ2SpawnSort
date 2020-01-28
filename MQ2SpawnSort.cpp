@@ -104,7 +104,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 				{
 					if (GetCharInfo()->pXTargetMgr->XTargetSlots[i].SpawnID == pSpawn->SpawnID)
 					{
-						typeVar.Type = pXTargetType;
+						typeVar.Type = mq::datatypes::pXTargetType;
 						typeVar.DWord = i;
 						break;
 					}
@@ -119,7 +119,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 
 					if (GetCharInfo()->pGroupInfo->pMember[i]->pSpawn == pSpawn)
 					{
-						typeVar.Type = pGroupMemberType;
+						typeVar.Type = mq::datatypes::pGroupMemberType;
 						typeVar.DWord = i;
 						break;
 					}
@@ -128,7 +128,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 			// Default to plain old spawn
 			else
 			{
-				typeVar.Type = pSpawnType;
+				typeVar.Type = mq::datatypes::pSpawnType;
 				typeVar.Ptr = pSpawn;
 			}
 
@@ -145,13 +145,13 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 			else if (_stricmp(member, "PathLength") || ret.Float != -1.0f)
 			{
 				// Figure out which function to use to add to a map, based type of result, if we don't already know it
-				if (ret.Type == pDoubleType)
+				if (ret.Type == mq::datatypes::pDoubleType)
 					listByDouble.insert(std::pair<double, PSPAWNINFO>(ret.Double, pSpawn));
-				else if (ret.Type == pFloatType)
+				else if (ret.Type == mq::datatypes::pFloatType)
 					listByDouble.insert(std::pair<double, PSPAWNINFO>(ret.Float, pSpawn));
-				else if (ret.Type == pInt64Type)
+				else if (ret.Type == mq::datatypes::pInt64Type)
 					listBySigned.insert(std::pair<__int64, PSPAWNINFO>(ret.Int64, pSpawn));
-				else if (ret.Type == pIntType || ret.Type == pByteType || ret.Type == pBoolType)
+				else if (ret.Type == mq::datatypes::pIntType || ret.Type == mq::datatypes::pByteType || ret.Type == mq::datatypes::pBoolType)
 					listBySigned.insert(std::pair<__int64, PSPAWNINFO>(ret.Int, pSpawn));
 				else
 				{
@@ -190,7 +190,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 	pSpawn = results[ascending ? n - 1 : results.size() - n];
 	
 	// Return the "best" possible type based on the spawn search, defaulting to Spawn
-	Ret.Type = pSpawnType;
+	Ret.Type = mq::datatypes::pSpawnType;
 	Ret.Ptr = pSpawn;
 
 	if (searchSpawn.bXTarHater)
@@ -199,7 +199,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 		{
 			if (GetCharInfo()->pXTargetMgr->XTargetSlots[i].SpawnID == pSpawn->SpawnID)
 			{
-				Ret.Type = pXTargetType;
+				Ret.Type = mq::datatypes::pXTargetType;
 				Ret.DWord = i;
 				break;
 			}
@@ -214,7 +214,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 
 			if (GetCharInfo()->pGroupInfo->pMember[i]->pSpawn == pSpawn)
 			{
-				Ret.Type = pGroupMemberType;
+				Ret.Type = mq::datatypes::pGroupMemberType;
 				Ret.DWord = i;
 				break;
 			}

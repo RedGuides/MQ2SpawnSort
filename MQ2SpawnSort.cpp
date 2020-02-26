@@ -73,7 +73,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 
 	// Sorted container for results. Only one of these will be used, which one will depend on the type of the first result
 	std::multimap<double, PSPAWNINFO> listByDouble;
-	std::multimap<__int64, PSPAWNINFO> listBySigned;
+	std::multimap<int64_t, PSPAWNINFO> listBySigned;
 	std::multimap<std::string, PSPAWNINFO> listByString;
 	// This should probably just be a key of MQTypeVar with a comparator created for it but that'll cause problems with string storage so meh
 
@@ -150,9 +150,9 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 				else if (ret.Type == mq::datatypes::pFloatType)
 					listByDouble.insert(std::pair<double, PSPAWNINFO>(ret.Float, pSpawn));
 				else if (ret.Type == mq::datatypes::pInt64Type)
-					listBySigned.insert(std::pair<__int64, PSPAWNINFO>(ret.Int64, pSpawn));
+					listBySigned.insert(std::pair<int64_t, PSPAWNINFO>(ret.Int64, pSpawn));
 				else if (ret.Type == mq::datatypes::pIntType || ret.Type == mq::datatypes::pByteType || ret.Type == mq::datatypes::pBoolType)
-					listBySigned.insert(std::pair<__int64, PSPAWNINFO>(ret.Int, pSpawn));
+					listBySigned.insert(std::pair<int64_t, PSPAWNINFO>(ret.Int, pSpawn));
 				else
 				{
 					// Default, calls ToString
@@ -188,7 +188,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 		return false;
 
 	pSpawn = results[ascending ? n - 1 : results.size() - n];
-
+	
 	// Return the "best" possible type based on the spawn search, defaulting to Spawn
 	Ret.Type = mq::datatypes::pSpawnType;
 	Ret.Ptr = pSpawn;

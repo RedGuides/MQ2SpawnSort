@@ -1,10 +1,10 @@
-#include "../MQ2Plugin.h"
+#include <mq/Plugin.h>
 #include <functional>
 
 PLUGIN_VERSION(0.2);
 PreSetup("MQ2SpawnSort");
 
-BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret);
+bool dataSpawnSort(const char* szIndex, MQTypeVar& Ret);
 
 // Called once, when the plugin is to initialize
 PLUGIN_API VOID InitializePlugin(VOID)
@@ -18,20 +18,23 @@ PLUGIN_API VOID ShutdownPlugin(VOID)
 	RemoveMQ2Data("SpawnSort");
 }
 
-BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
+bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 {
 	// szIndex format:
 	// <n>,<asc|desc>,<member>,<spawn search string>
 	char szArg[MAX_STRING] = { 0 };
 
+	char mutableIndex[MAX_STRING] = { 0 };
+	strcpy_s(mutableIndex, szIndex);
+
 	unsigned int n;
 	bool ascending;
 	char member[MAX_STRING] = { 0 };
 	char index[MAX_STRING] = { 0 };
-	SEARCHSPAWN searchSpawn;
+	MQSpawnSearch searchSpawn;
 
 	// n
-	if (GetArg(szArg, szIndex, 1, FALSE, FALSE, TRUE) && strlen(szArg) > 0)
+	if (GetArg(szArg, mutableIndex, 1, FALSE, FALSE, TRUE) && strlen(szArg) > 0)
 	{
 		char * pFound;
 		n = strtoul(szArg, &pFound, 10);
@@ -42,7 +45,7 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 		return false;
 
 	// asc|desc
-	if (GetArg(szArg, szIndex, 2, FALSE, FALSE, TRUE) && strlen(szArg) > 0)
+	if (GetArg(szArg, mutableIndex, 2, FALSE, FALSE, TRUE) && strlen(szArg) > 0)
 	{
 		if (!_stricmp(szArg, "asc"))
 			ascending = true;
@@ -55,11 +58,11 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 		return false;
 
 	// member
-	if (!GetArg(member, szIndex, 3, FALSE, FALSE, TRUE) || strlen(szArg) == 0)
+	if (!GetArg(member, mutableIndex, 3, FALSE, FALSE, TRUE) || strlen(szArg) == 0)
 		return false;
 
 	// spawn search string, it's whatever's left
-	strcpy_s(szArg, GetNextArg(szIndex, 3, TRUE));
+	strcpy_s(szArg, GetNextArg(mutableIndex, 3, TRUE));
 	if (strlen(szArg) > 0)
 	{
 		ClearSearchSpawn(&searchSpawn);
@@ -72,7 +75,7 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 	std::multimap<double, PSPAWNINFO> listByDouble;
 	std::multimap<__int64, PSPAWNINFO> listBySigned;
 	std::multimap<std::string, PSPAWNINFO> listByString;
-	// This should probably just be a key of MQ2TYPEVAR with a comparator created for it but that'll cause problems with string storage so meh
+	// This should probably just be a key of MQTypeVar with a comparator created for it but that'll cause problems with string storage so meh
 
 	PSPAWNINFO pOrigin = searchSpawn.FromSpawnID ? (PSPAWNINFO)GetSpawnByID(searchSpawn.FromSpawnID) : (PSPAWNINFO)pCharSpawn; // idk what this is but superwho does it so I will too
 	PSPAWNINFO pSpawn = (PSPAWNINFO)pSpawnList;
@@ -82,8 +85,8 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 	{
 		if (SpawnMatchesSearch(&searchSpawn, pOrigin, pSpawn))
 		{
-			MQ2TYPEVAR typeVar = { 0 };
-			MQ2TYPEVAR ret = { 0 };
+			MQTypeVar typeVar;
+			MQTypeVar ret;
 
 			// Special cases for MQ2Nav members
 			if (!_stricmp(member, "PathExists") || !_stricmp(member, "PathLength"))
@@ -97,11 +100,11 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 			// If search string allows us to restrict to group member or xtarget, we can use those types instead of spawn
 			else if (searchSpawn.bXTarHater)
 			{
-				for (auto i = 0; i < 13; i++)
+				for (auto i = 0; i < MAX_XTARGETS; i++)
 				{
 					if (GetCharInfo()->pXTargetMgr->XTargetSlots[i].SpawnID == pSpawn->SpawnID)
 					{
-						typeVar.Type = pXTargetType;
+						typeVar.Type = mq::datatypes::pXTargetType;
 						typeVar.DWord = i;
 						break;
 					}
@@ -109,14 +112,14 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 			}
 			else if (searchSpawn.bGroup)
 			{
-				for (auto i = 0; i < 6; i++)
+				for (auto i = 0; i < MAX_GROUP_SIZE; i++)
 				{
 					if (!GetCharInfo()->pGroupInfo->pMember[i])
 						continue;
 
 					if (GetCharInfo()->pGroupInfo->pMember[i]->pSpawn == pSpawn)
 					{
-						typeVar.Type = pGroupMemberType;
+						typeVar.Type = mq::datatypes::pGroupMemberType;
 						typeVar.DWord = i;
 						break;
 					}
@@ -125,7 +128,7 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 			// Default to plain old spawn
 			else
 			{
-				typeVar.Type = pSpawnType;
+				typeVar.Type = mq::datatypes::pSpawnType;
 				typeVar.Ptr = pSpawn;
 			}
 
@@ -142,13 +145,13 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 			else if (_stricmp(member, "PathLength") || ret.Float != -1.0f)
 			{
 				// Figure out which function to use to add to a map, based type of result, if we don't already know it
-				if (ret.Type == pDoubleType)
+				if (ret.Type == mq::datatypes::pDoubleType)
 					listByDouble.insert(std::pair<double, PSPAWNINFO>(ret.Double, pSpawn));
-				else if (ret.Type == pFloatType)
+				else if (ret.Type == mq::datatypes::pFloatType)
 					listByDouble.insert(std::pair<double, PSPAWNINFO>(ret.Float, pSpawn));
-				else if (ret.Type == pInt64Type)
+				else if (ret.Type == mq::datatypes::pInt64Type)
 					listBySigned.insert(std::pair<__int64, PSPAWNINFO>(ret.Int64, pSpawn));
-				else if (ret.Type == pIntType || ret.Type == pByteType || ret.Type == pBoolType)
+				else if (ret.Type == mq::datatypes::pIntType || ret.Type == mq::datatypes::pByteType || ret.Type == mq::datatypes::pBoolType)
 					listBySigned.insert(std::pair<__int64, PSPAWNINFO>(ret.Int, pSpawn));
 				else
 				{
@@ -185,18 +188,18 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 		return false;
 
 	pSpawn = results[ascending ? n - 1 : results.size() - n];
-	
+
 	// Return the "best" possible type based on the spawn search, defaulting to Spawn
-	Ret.Type = pSpawnType;
+	Ret.Type = mq::datatypes::pSpawnType;
 	Ret.Ptr = pSpawn;
 
 	if (searchSpawn.bXTarHater)
 	{
-		for (auto i = 0; i < 13; i++)
+		for (auto i = 0; i < MAX_XTARGETS; i++)
 		{
 			if (GetCharInfo()->pXTargetMgr->XTargetSlots[i].SpawnID == pSpawn->SpawnID)
 			{
-				Ret.Type = pXTargetType;
+				Ret.Type = mq::datatypes::pXTargetType;
 				Ret.DWord = i;
 				break;
 			}
@@ -204,14 +207,14 @@ BOOL dataSpawnSort(PCHAR szIndex, MQ2TYPEVAR &Ret)
 	}
 	else if (searchSpawn.bGroup)
 	{
-		for (auto i = 0; i < 6; i++)
+		for (auto i = 0; i < MAX_GROUP_SIZE; i++)
 		{
 			if (!GetCharInfo()->pGroupInfo->pMember[i])
 				continue;
 
 			if (GetCharInfo()->pGroupInfo->pMember[i]->pSpawn == pSpawn)
 			{
-				Ret.Type = pGroupMemberType;
+				Ret.Type = mq::datatypes::pGroupMemberType;
 				Ret.DWord = i;
 				break;
 			}

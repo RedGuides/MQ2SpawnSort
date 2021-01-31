@@ -114,10 +114,8 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 			{
 				for (auto i = 0; i < MAX_GROUP_SIZE; i++)
 				{
-					if (!GetCharInfo()->pGroupInfo->pMember[i])
-						continue;
-
-					if (GetCharInfo()->pGroupInfo->pMember[i]->pSpawn == pSpawn)
+					const auto groupMember = GetGroupMember(i);
+					if (groupMember && groupMember->SpawnID == pSpawn->SpawnID)
 					{
 						typeVar.Type = mq::datatypes::pGroupMemberType;
 						typeVar.DWord = i;
@@ -188,11 +186,12 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 		return false;
 
 	pSpawn = results[ascending ? n - 1 : results.size() - n];
-	
+
 	// Return the "best" possible type based on the spawn search, defaulting to Spawn
 	Ret.Type = mq::datatypes::pSpawnType;
 	Ret.Ptr = pSpawn;
 
+	// FIXME:  Why do this work twice -- for bXTarHater and bGroup
 	if (searchSpawn.bXTarHater)
 	{
 		for (auto i = 0; i < MAX_XTARGETS; i++)
@@ -209,10 +208,8 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 	{
 		for (auto i = 0; i < MAX_GROUP_SIZE; i++)
 		{
-			if (!GetCharInfo()->pGroupInfo->pMember[i])
-				continue;
-
-			if (GetCharInfo()->pGroupInfo->pMember[i]->pSpawn == pSpawn)
+			const auto groupMember = GetGroupMember(i);
+			if (groupMember && groupMember->SpawnID == pSpawn->SpawnID)
 			{
 				Ret.Type = mq::datatypes::pGroupMemberType;
 				Ret.DWord = i;

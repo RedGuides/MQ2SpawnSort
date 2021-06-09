@@ -163,7 +163,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 			gFilterMQ = false;
 		}
 
-		pSpawn = pSpawn->pNext;
+		pSpawn = pSpawn->GetNext();
 	}
 
 	// Now one of the maps contains a list of spawns that match the search string, sorted by whatever member
@@ -188,8 +188,7 @@ bool dataSpawnSort(const char* szIndex, MQTypeVar &Ret)
 	pSpawn = results[ascending ? n - 1 : results.size() - n];
 
 	// Return the "best" possible type based on the spawn search, defaulting to Spawn
-	Ret.Type = mq::datatypes::pSpawnType;
-	Ret.Ptr = pSpawn;
+	Ret = mq::datatypes::pSpawnType->MakeTypeVar(pSpawn);
 
 	// FIXME:  Why do this work twice -- for bXTarHater and bGroup
 	if (searchSpawn.bXTarHater)

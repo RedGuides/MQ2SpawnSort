@@ -12,17 +12,20 @@ There's a special case to handle MQ2Nav as well, see examples.
 
 ## Forms
 <!--tlo-forms-start-->
-### {{ renderMember(type='spawn', name='SpawnSort', params='<n>,<asc|desc>,<member>,<spawnsearch>') }}
+/// member | spawn SpawnSort[<n>,<asc|desc>,<member>,<spawnsearch>]
+    label: SpawnSort[n,asc|desc,member,spawnsearch]
+Returns the nth spawn that matches your [spawn search] string, sorting in ascending or descending order by whatever member you like (Level, PctHPs, etc). The member to sort by can be anything on a spawn type, so if you can do `${Spawn[something].<member>}`, it'll work. A notable exception is "sub-members", like `Class.ShortName`. If there's a period in there, it won't work 😔.
+///
 
-:   Returns the nth spawn that matches your [spawn search] string, sorting in ascending or descending order by whatever member you like (Level, PctHPs, etc). The member to sort by can be anything on a spawn type, so if you can do `${Spawn[something].<member>}`, it'll work. A notable exception is "sub-members", like `Class.ShortName`. If there's a period in there, it won't work 😔.
+/// member | xtarget SpawnSort[<n>,<asc|desc>,<member>,<xtarget-specific spawnsearch>]
+    label: SpawnSort[n,asc|desc,member,xtarget-specific spawnsearch]
+If the [spawn search] string restricts it to NPCs on your xtarget (i.e. includes xtarhater), you can sort by xtarget members, e.g. ${SpawnSort[1,asc,PctAggro,xtarhater].PctAggro, and it will return XTargetType instead of SpawnType. 
+///
 
-### {{ renderMember(type='xtarget', name='SpawnSort', params='<n>,<asc|desc>,<member>,<xtarget-specific spawnsearch>') }}
-
-:   If the [spawn search] string restricts it to NPCs on your xtarget (i.e. includes xtarhater), you can sort by xtarget members, e.g. ${SpawnSort[1,asc,PctAggro,xtarhater].PctAggro, and it will return XTargetType instead of SpawnType. 
-
-### {{ renderMember(type='groupmember', name='SpawnSort', params='<n>,<asc|desc>,<member>,group') }}
-
-:   You can also use "group" in [spawn search], and sort by something on groupmember (probably the most useful is PctAggro again). It'll return GroupMemberType too. 
+/// member | groupmember SpawnSort[<n>,<asc|desc>,<member>,group]
+    label: SpawnSort[n,asc|desc,member,group]
+You can also use "group" in [spawn search], and sort by something on groupmember (probably the most useful is PctAggro again). It'll return GroupMemberType too. 
+///
 <!--tlo-forms-end-->
 
 ## Examples
